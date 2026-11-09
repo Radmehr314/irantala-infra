@@ -62,6 +62,22 @@ services:
       Sms__Mediana__SenderNumber: ${MEDIANA_SENDER_NUMBER}
       Sms__Mediana__OtpPatternCode: ${MEDIANA_OTP_PATTERN}
 
+  market:
+    <<: *service
+    build: { context: ., args: { APP: IranTalaShop.Market.Api } }
+    image: irantala/market:latest
+    container_name: market
+    environment:
+      <<: *common-env
+      Hosting__PathBase: /market
+      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
+      Market__Feed__Simulated__Enabled: ${MARKET_SIMULATED:-false}
+      Market__Feed__Tgnsrv__Enabled: ${MARKET_TGNSRV_ENABLED:-false}
+      Market__Feed__Tgnsrv__Url: ${MARKET_TGNSRV_URL:-}
+      Market__Feed__Streamdata__Enabled: ${MARKET_STREAMDATA_ENABLED:-false}
+      Market__Feed__Streamdata__Url: ${MARKET_STREAMDATA_URL:-}
+
   gateway:
     <<: *service
     image: nginx:alpine
@@ -70,4 +86,4 @@ services:
       - "80:80"
     volumes:
       - ./gateway.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on: [iam, profile, notification]
+    depends_on: [iam, profile, notification, market]
