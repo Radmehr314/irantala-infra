@@ -1,0 +1,51 @@
+name: Deploy infra
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: infra
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate compose files
+        run: |
+          cp infra/.env.example /tmp/infra.env && cp app/.env.example /tmp/app.env
+          docker compose -f infra/docker-compose.yml --env-file /tmp/infra.env config --quiet
+          docker compose -f app/docker-compose.yml --env-file /tmp/app.env config --quiet
+
+      # Server-only files (.env, mongo-keyfile, secrets/) are never touched.
+      # Files mounted into containers are overwritten in place, so the running mount sees the new content.
+      - name: Copy files to the server folders
+        run: |
+          mkdir -p /opt/irantala/infra/sms-relay
+          cat infra/docker-compose.yml > /opt/irantala/infra/docker-compose.yml
+          cat infra/sms-relay/default.conf > /opt/irantala/infra/sms-relay/default.conf
+          cat app/docker-compose.yml > /opt/irantala/app/docker-compose.yml
+          cat app/gateway.conf > /opt/irantala/app/gateway.conf
+          cat app/Dockerfile > /opt/irantala/app/Dockerfile
+          cat scripts/backup-mongo.sh > /opt/irantala/backup-mongo.sh && chmod 755 /opt/irantala/backup-mongo.sh
+
+      - name: Apply infrastructure
+        run: docker compose -f /opt/irantala/infra/docker-compose.yml up -d --remove-orphans
+
+      - name: Reload nginx configs
+        run: |
+          docker exec sms-relay nginx -t && docker exec sms-relay nginx -s reload
+          if docker ps --format '{{.Names}}' | grep -qx gateway; then
+            docker exec gateway nginx -t && docker exec gateway nginx -s reload
+          else
+            docker compose -f /opt/irantala/app/docker-compose.yml up -d --no-deps gateway
+          fi
+
+      - name: Status
+        run: |
+          docker compose -f /opt/irantala/infra/docker-compose.yml ps --format 'table {{.Name}}\t{{.Status}}'
+          curl -fsS http://localhost/ && echo
