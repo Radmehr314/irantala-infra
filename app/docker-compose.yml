@@ -32,6 +32,7 @@ services:
       Iam__Tokens__SigningKeys__0__KeyId: ${IAM_SIGNING_KEY_ID}
       Iam__Tokens__SigningKeys__0__PrivateKeyPath: /run/secrets/iam-signing-key.pem
       Iam__Otp__Secret: ${IAM_OTP_SECRET}
+      Iam__Passwords__Pepper: ${IAM_PASSWORD_PEPPER}
       Iam__Bootstrap__SuperAdminPhoneNumbers__0: ${SUPER_ADMIN_PHONE}
     volumes:
       - ./secrets/iam-signing-key.pem:/run/secrets/iam-signing-key.pem:ro
