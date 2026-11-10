@@ -39,13 +39,11 @@ jobs:
       - name: Reload nginx configs
         run: |
           docker exec sms-relay nginx -t && docker exec sms-relay nginx -s reload
-          if docker ps --format '{{.Names}}' | grep -qx gateway; then
-            docker exec gateway nginx -t && docker exec gateway nginx -s reload
-          else
-            docker compose -f /opt/irantala/app/docker-compose.yml up -d --no-deps gateway
-          fi
+          # Recreates the gateway only when its ports or image changed; otherwise just reloads the config.
+          docker compose -f /opt/irantala/app/docker-compose.yml up -d --no-deps gateway
+          docker exec gateway nginx -t && docker exec gateway nginx -s reload
 
       - name: Status
         run: |
           docker compose -f /opt/irantala/infra/docker-compose.yml ps --format 'table {{.Name}}\t{{.Status}}'
-          curl -fsS http://localhost/ && echo
+          curl -fsS http://localhost/iam/health/ready && echo

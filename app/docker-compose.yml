@@ -79,12 +79,33 @@ services:
       Market__Feed__Streamdata__Enabled: ${MARKET_STREAMDATA_ENABLED:-false}
       Market__Feed__Streamdata__Url: ${MARKET_STREAMDATA_URL:-}
 
+  # Frontends: images are built by each repo's pipeline (irantala-pwa, irantala-landings), never pulled.
+  # Runtime settings go in /opt/irantala/frontend/<name>.env, which the pipeline also uses at build time.
+  pwa:
+    <<: *service
+    image: irantala/pwa:latest
+    pull_policy: never
+    container_name: pwa
+    env_file:
+      - path: /opt/irantala/frontend/pwa.env
+        required: false
+
+  landings:
+    <<: *service
+    image: irantala/landings:latest
+    pull_policy: never
+    container_name: landings
+    env_file:
+      - path: /opt/irantala/frontend/landings.env
+        required: false
+
   gateway:
     <<: *service
     image: nginx:alpine
     container_name: gateway
     ports:
       - "80:80"
+      - "3000:3000"
     volumes:
       - ./gateway.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on: [iam, profile, notification, market]
