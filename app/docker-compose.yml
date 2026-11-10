@@ -93,6 +93,40 @@ services:
       Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
 
+  wallet:
+    <<: *service
+    build: { context: ., args: { APP: IranTalaShop.Wallet.Api } }
+    image: irantala/wallet:latest
+    container_name: wallet
+    environment:
+      <<: *common-env
+      Hosting__PathBase: /wallet
+      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
+
+  vault:
+    <<: *service
+    build: { context: ., args: { APP: IranTalaShop.Vault.Api } }
+    image: irantala/vault:latest
+    container_name: vault
+    environment:
+      <<: *common-env
+      Hosting__PathBase: /vault
+      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
+
+  workflow:
+    <<: *service
+    build: { context: ., args: { APP: IranTalaShop.Workflow.Api } }
+    image: irantala/workflow:latest
+    container_name: workflow
+    environment:
+      <<: *common-env
+      Hosting__PathBase: /workflow
+      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
+      Workflow__AlertPhoneNumbers__0: ${SUPER_ADMIN_PHONE:-}
+
   # Frontends: images are built by each repo's pipeline (irantala-pwa, irantala-landings), never pulled.
   # Runtime settings go in /opt/irantala/frontend/<name>.env, which the pipeline also uses at build time.
   pwa:
