@@ -79,6 +79,17 @@ services:
       Market__Feed__Streamdata__Enabled: ${MARKET_STREAMDATA_ENABLED:-false}
       Market__Feed__Streamdata__Url: ${MARKET_STREAMDATA_URL:-}
 
+  appconfig:
+    <<: *service
+    build: { context: ., args: { APP: IranTalaShop.AppConfig.Api } }
+    image: irantala/appconfig:latest
+    container_name: appconfig
+    environment:
+      <<: *common-env
+      Hosting__PathBase: /appconfig
+      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
+
   # Frontends: images are built by each repo's pipeline (irantala-pwa, irantala-landings), never pulled.
   # Runtime settings go in /opt/irantala/frontend/<name>.env, which the pipeline also uses at build time.
   pwa:
