@@ -47,6 +47,9 @@ services:
       Hosting__PathBase: /userprofile
       Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
+      Profile__Kyc__Jibit__Enabled: ${JIBIT_ENABLED:-false}
+      Profile__Kyc__Jibit__ApiKey: ${JIBIT_API_KEY:-}
+      Profile__Kyc__Jibit__SecretKey: ${JIBIT_SECRET_KEY:-}
 
   notification:
     <<: *service
