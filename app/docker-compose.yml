@@ -10,6 +10,7 @@ x-common-env: &common-env
   Hosting__TrustedProxies__0: 172.16.0.0/12
   Hosting__Auth__Audience: irantalashop
   Hosting__Auth__RequireHttpsMetadata: "false"
+  Hosting__AllowedOrigins__0: https://app.irantalashop.ir
   Mongo__ConnectionString: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/?replicaSet=rs0&authSource=admin
   RabbitMq__Host: rabbitmq
   RabbitMq__Username: ${RABBITMQ_USER}

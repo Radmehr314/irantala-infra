@@ -43,6 +43,12 @@ jobs:
           docker compose -f /opt/irantala/app/docker-compose.yml up -d --no-deps gateway
           docker exec gateway nginx -t && docker exec gateway nginx -s reload
 
+      - name: Recreate running app services whose config changed
+        run: |
+          cd /opt/irantala/app
+          running=$(docker compose ps --services --status running | grep -vx gateway || true)
+          if [ -n "$running" ]; then docker compose up -d --no-build --no-deps $running; fi
+
       - name: Status
         run: |
           docker compose -f /opt/irantala/infra/docker-compose.yml ps --format 'table {{.Name}}\t{{.Status}}'
