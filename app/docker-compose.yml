@@ -128,6 +128,21 @@ services:
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
       Workflow__AlertPhoneNumbers__0: ${SUPER_ADMIN_PHONE:-}
 
+  crm:
+    <<: *service
+    build: { context: ., args: { APP: IranTalaShop.Crm.Api } }
+    image: irantala/crm:latest
+    container_name: crm
+    environment:
+      <<: *common-env
+      Hosting__PathBase: /crm
+      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
+      Crm__Storage__RootPath: /data/attachments
+    # Ticket attachments live on the server disk; owned by the container user (uid 1654), backed up daily.
+    volumes:
+      - ./data/crm/attachments:/data/attachments
+
   # Frontends: images are built by each repo's pipeline (irantala-pwa, irantala-landings), never pulled.
   # Runtime settings go in /opt/irantala/frontend/<name>.env, which the pipeline also uses at build time.
   pwa:

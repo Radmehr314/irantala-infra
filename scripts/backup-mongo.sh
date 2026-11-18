@@ -8,3 +8,10 @@ mkdir -p "$DIR"
 docker exec mongo mongodump --quiet -u "$MONGO_ROOT_USER" -p "$MONGO_ROOT_PASSWORD" --authenticationDatabase admin --gzip --archive > "$DIR/.mongo-$STAMP.tmp"
 mv "$DIR/.mongo-$STAMP.tmp" "$DIR/mongo-$STAMP.gz"
 find "$DIR" -name 'mongo-*.gz' -mtime +7 -delete
+
+# CRM ticket attachments.
+if [ -d /opt/irantala/app/data/crm/attachments ]; then
+  tar -czf "$DIR/.crm-files-$STAMP.tmp" -C /opt/irantala/app/data/crm attachments
+  mv "$DIR/.crm-files-$STAMP.tmp" "$DIR/crm-files-$STAMP.tar.gz"
+fi
+find "$DIR" -name 'crm-files-*.tar.gz' -mtime +7 -delete
