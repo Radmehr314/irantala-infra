@@ -167,12 +167,16 @@ services:
     <<: *service
     image: irantala/backoffice:latest
     pull_policy: never
-    container_name: backoffice
+    container_name: irantala-backoffice
 
   gateway:
     <<: *service
     image: nginx:alpine
     container_name: gateway
+    # Unique alias: the irantala network is shared with the old platform, whose containers reuse names like backoffice.
+    networks:
+      irantala:
+        aliases: [irantala-gateway]
     ports:
       - "80:80"
       - "3000:3000"
