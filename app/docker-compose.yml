@@ -12,6 +12,8 @@ x-common-env: &common-env
   Hosting__Auth__RequireHttpsMetadata: "false"
   Hosting__AllowedOrigins__0: https://app.irantalashop.ir
   Hosting__AllowedOrigins__1: http://185.26.32.176:3000
+  Hosting__AllowedOrigins__2: https://irantalashop.ir
+  Hosting__AllowedOrigins__3: https://www.irantalashop.ir
   Mongo__ConnectionString: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/?replicaSet=rs0&authSource=admin
   RabbitMq__Host: rabbitmq
   RabbitMq__Username: ${RABBITMQ_USER}
@@ -30,7 +32,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /iam
-      Iam__Tokens__Issuer: http://${PUBLIC_HOST}/iam
+      Iam__Tokens__Issuer: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Iam__Tokens__SigningKeys__0__KeyId: ${IAM_SIGNING_KEY_ID}
       Iam__Tokens__SigningKeys__0__PrivateKeyPath: /run/secrets/iam-signing-key.pem
       Iam__Otp__Secret: ${IAM_OTP_SECRET}
@@ -47,7 +49,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /userprofile
-      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__Authority: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
       Profile__Kyc__Jibit__Enabled: ${JIBIT_ENABLED:-false}
       Profile__Kyc__Jibit__ApiKey: ${JIBIT_API_KEY:-}
@@ -61,7 +63,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /notification
-      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__Authority: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
       Sms__Provider: Mediana
       Sms__Mediana__ApiKey: ${MEDIANA_API_KEY}
@@ -76,7 +78,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /market
-      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__Authority: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
       Market__Feed__Simulated__Enabled: ${MARKET_SIMULATED:-false}
       Market__Feed__Tgnsrv__Enabled: ${MARKET_TGNSRV_ENABLED:-false}
@@ -92,7 +94,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /appconfig
-      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__Authority: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
 
   wallet:
@@ -103,7 +105,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /wallet
-      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__Authority: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
 
   vault:
@@ -114,7 +116,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /vault
-      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__Authority: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
 
   workflow:
@@ -125,7 +127,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /workflow
-      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__Authority: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
       Workflow__AlertPhoneNumbers__0: ${SUPER_ADMIN_PHONE:-}
 
@@ -137,7 +139,7 @@ services:
     environment:
       <<: *common-env
       Hosting__PathBase: /crm
-      Hosting__Auth__Authority: http://${PUBLIC_HOST}/iam
+      Hosting__Auth__Authority: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST}/iam
       Hosting__Auth__MetadataAddress: http://iam:8080/iam/.well-known/openid-configuration
       Crm__Storage__RootPath: /data/attachments
     # Ticket attachments live on the server disk; owned by the container user (uid 1654), backed up daily.
